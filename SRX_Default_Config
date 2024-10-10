@@ -1,0 +1,37 @@
+set version 10.4R6.5
+set system root-authentication encrypted-password "$1$JkXTYOtA$nPX6lyXgQekHVdjaQq1Li."
+set system name-server 8.8.8.8
+set system name-server 8.8.4.4
+set system services dhcp router 192.168.0.1
+set system services dhcp pool 192.168.0.0/24 address-range low 192.168.0.2
+set system services dhcp pool 192.168.0.0/24 address-range high 192.168.0.254
+set interfaces interface-range range-1 member ge-0/0/1
+set interfaces interface-range range-1 member-range fe-0/0/2 to fe-0/0/7
+set interfaces interface-range range-1 unit 0 family ethernet-switching port-mode access
+set interfaces interface-range range-1 unit 0 family ethernet-switching vlan members V10
+set interfaces ge-0/0/0 unit 0 family inet dhcp
+set interfaces vlan unit 10 family inet address 192.168.0.1/24
+set security nat source rule-set R1 from zone trust
+set security nat source rule-set R1 to zone untrust
+set security nat source rule-set R1 rule R1-1 match source-address 192.168.0.0/24
+set security nat source rule-set R1 rule R1-1 then source-nat interface
+set security zones security-zone untrust interfaces ge-0/0/0.0 host-inbound-traffic system-services all
+set security zones security-zone trust interfaces ge-0/0/1.0 host-inbound-traffic system-services all
+set security zones security-zone trust interfaces fe-0/0/2.0 host-inbound-traffic system-services all
+set security zones security-zone trust interfaces fe-0/0/3.0 host-inbound-traffic system-services all
+set security zones security-zone trust interfaces fe-0/0/4.0 host-inbound-traffic system-services all
+set security zones security-zone trust interfaces fe-0/0/5.0 host-inbound-traffic system-services all
+set security zones security-zone trust interfaces fe-0/0/6.0 host-inbound-traffic system-services all
+set security zones security-zone trust interfaces fe-0/0/7.0 host-inbound-traffic system-services all
+set security zones security-zone trust interfaces vlan.10 host-inbound-traffic system-services all
+set security policies from-zone trust to-zone untrust policy TRUST-UNTRUST match source-address any
+set security policies from-zone trust to-zone untrust policy TRUST-UNTRUST match destination-address any
+set security policies from-zone trust to-zone untrust policy TRUST-UNTRUST match application any
+set security policies from-zone trust to-zone untrust policy TRUST-UNTRUST then permit
+set security policies from-zone untrust to-zone trust policy UNTRUST-TRUST match source-address any
+set security policies from-zone untrust to-zone trust policy UNTRUST-TRUST match destination-address any
+set security policies from-zone untrust to-zone trust policy UNTRUST-TRUST match application any
+set security policies from-zone untrust to-zone trust policy UNTRUST-TRUST then deny
+set vlans V10 vlan-id 10
+set vlans V10 l3-interface vlan.10
+
